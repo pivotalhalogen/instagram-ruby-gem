@@ -163,6 +163,21 @@ module Instagram
       response["data"]
     end
 
+    def firehose(*args)
+      options = args.last.is_a?(Hash) ? args.pop : {}
+      id = args.first || "self"
+      since_timestamp = options.delete(:since)
+      timestamp = since_timestamp.is_a?(Time) ? since_timestamp : Time.at(since_timestamp.to_i)
+      response = get("users/#{id}/media/recent", options)
+      return [] if Time.at(response['data'].first.try(:created_time).to_i) <= timestamp
+      all_data = response['data']
+      until(response['pagination'].empty? || Time.at(response['data'].first.try(:created_time).to_i) <= timestamp)  do
+        response = get("users/#{id}/media/recent", options.merge({:max_id => response['pagination']['next_max_id']}))
+        all_data += response['data']
+      end
+      all_data.select {|entry| entry.created_time.to_i > timestamp.to_i}
+    end
+
     # Returns a list of media items liked by the current user
     #
     # @overload user_liked_media(options={})
