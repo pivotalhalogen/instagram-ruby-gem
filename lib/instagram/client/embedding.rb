@@ -3,6 +3,7 @@ module Instagram
     module Embedding
       def oembed(*args)
         url = args.first
+        return nil unless url
         get("oembed?url=#{url}", {}, false, true)
       end
     end

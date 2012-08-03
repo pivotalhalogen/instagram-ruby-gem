@@ -25,6 +25,11 @@ describe Instagram::Client do
           oembed = @client.oembed("http://instagram.com/p/abcdef")
           oembed.media_id.should == "123657555223544123_41812344"
         end
+
+        it "should return nil if a URL is not provided" do
+          oembed = @client.oembed
+          oembed.should be_nil
+        end
       end
     end
   end
